@@ -1,92 +1,319 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <link rel="stylesheet" href="style.css">
+    <head>
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-        <script src="scripts.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/style.css') }}">
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+          <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+          <script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+          <script type=text/javascript>
+            $SCRIPT_ROOT = {{request.script_root|tojson|safe }};
+          </script>
+          <script type=text/javascript>
+            $(function() {
+              $('a#Plan').bind('click', function() {
+                $.getJSON($SCRIPT_ROOT + '/searchCourse', {
+                  a: $('input[name="a"]').val(),
+                  b: $('input[name="b"]').val()
+                }, function(data) {
+                  if(data.result != false) {
+                    $("#planList").prepend(data.result + '<br>');
+                  }
+                });
+                return false;
+              });
+              $('a#Completed').bind('click', function() {
+                $.getJSON($SCRIPT_ROOT + '/searchCourse', {
+                  a: $('input[name="a"]').val(),
+                  b: $('input[name="b"]').val()
+                }, function(data) {
+                  if(data.result != false) {
+                    $("#completedList").prepend(data.result + '<br>');
+                  }
+                });
+                return false;
+              });
+            });
+          </script>
     </head>
     <body>
-        <div class="container">
-            <nav>
+        <div style = "width: 300px; float: left; height: 900px; margin: 10px">
                 <div class="searchArea">
-                    <searchBox class="ui-widget">
-                        <!-- <label for="search">Search: </label> -->
-                        <input id="search" value = "search here">
-                        <form action = "http://localhost:5000/searchCourse" method = "post">
-                             <p>Enter Name:</p>
-                             <p><input type = "text" name = "dept" /></p>
-                             <p><input type = "text" name = "subNumber" /></p>
-                             <p><input type = "submit" value = "submit" /></p>
-                        </form>
-
-                    <table border = 1>
-
-                    </searchBox>
-                    <searchButtons>
-                        <button  id="plannedCourseButton" onclick="addToPlanList()" class = "button blueButton" type="button"> Plan to Complete
-                        </button>
-                        <button id="completedCourseButton" onclick="addToCompletedList()" class = "button greenButton" type="button"> Course Completed
-                        </button>
 
 
-                        <table border = 1>
-                         <thead>
-                            <td>departmentName</td>
-                            <td>subNumber</td>
-                            <td>name</td>
-                            <td>description</td>
-                         </thead>
-                         
-                         {% for row in rows %}
-                            <tr>
-                               <td>{{row["dept"]}}</td>
-                               <td>{{row["subNumber"]}}</td>
-                               <td> {{ row["name"]}}</td>
-                               <td>{{row['description']}}</td> 
-                            </tr>
-                         {% endfor %}
-                      </table>
+          <p><input type=text size=5 name=a>
+          <input type=text size=5 name=b>
 
-
-                    </searchButtons>
-
+          <p><a href=# id=Plan>Plan</a>
+          <p><a href=# id=Completed>Completed</a>
                 </div>
-                <div class="listsArea">
-
                     <div class="planList">
                         <h1 class="title"><center>Plan on Taking</center></h1>
                         <span id="planList">
 
                         </span>
                     </div>
-                    </br>
                     <div class="completedList">
                         <h1 class="title"><center>Completed Courses</center></h1>
                         <span id="completedList">
 
                         </span>
                     </div>
-
-                </div>
-                <!-- <div class="ui-widget" style="margin-top:2em; font-family:Arial">
-                    Result:
-                    <div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
-                </div> -->
-                <div class="settingsArea">
-                    <div style="width:50%;float:left">
-                        <input type="image" src="settings.png" />
-                    </div>
-                    <div style="width:50%;float:right">
-                        <button id="logoutButton" class = "button" type="button"> Logout </button>
-                    </div>
-                </div>
-            </nav>
-            <div class="tree">
-                tree goes here
-            </div>
+            <form name="theme" method="post" action="">
+            <p>
+            <input type="radio" name="theme" value="radio" onClick="changeColour('d')">Dark Theme
+            <br>
+            <input type="radio" name="theme" value="radio" onClick="changeColour('l')">Light Theme
+            <br>
+            </form>
 
         </div>
+        <div style = "width : 800px; float: left; height: 900px; margin-left: 20px; margin-top:100px">
+          <div class = "treeGraph", style = "float: left", id = "tree">
+          </div>
+        </div>
+
+<script>
+
+var threadCombo = localStorage.getItem("storageName");
+var string = "";
+if (threadCombo == "media/ai" || threadCombo == "ai/media") {
+
+} else if (threadCombo == "media/people" || threadCombo == "people/media") {
+
+} else if (threadCombo == "media/theory" || threadCombo == "theory/media") {
+
+} else if (threadCombo == "media/sysArch" || threadCombo == "sysArch/media") {
+
+} else if (threadCombo == "media/modSim" || threadCombo == "modSim/media") {
+
+} else if (threadCombo == "media/devices" || threadCombo == "devices/media") {
+
+} else if (threadCombo == "media/info" || threadCombo == "info/media") {
+
+} else if (threadCombo == "ai/people" || threadCombo == "people/ai") {
+
+} else if (threadCombo == "ai/theory" || threadCombo == "theory/ai") {
+  
+} else if (threadCombo == "ai/sysArch" || threadCombo == "sysArch/ai") {
+  
+} else if (threadCombo == "ai/modSim" || threadCombo == "modSim/ai") {
+  
+} else if (threadCombo == "ai/devices" || threadCombo == "devices/ai") {
+  
+} else if (threadCombo == "ai/info" || threadCombo == "info/ai") {
+  string = "threads/info&ai.json";
+} else if (threadCombo == "people/theory" || threadCombo == "theory/people") {
+  
+} else if (threadCombo == "people/sysArch" || threadCombo == "sysArch/people") {
+  
+} else if (threadCombo == "people/modSim" || threadCombo == "modSim/people") {
+  
+} else if (threadCombo == "people/devices" || threadCombo == "devices/people") {
+  
+} else if (threadCombo == "people/info" || threadCombo == "info/people") {
+  
+} else if (threadCombo == "theory/sysArch" || threadCombo == "sysArch/theory") {
+  
+} else if (threadCombo == "theory/modSim" || threadCombo == "modSim/theory") {
+  
+} else if (threadCombo == "theory/devices" || threadCombo == "devices/theory") {
+  
+} else if (threadCombo == "theory/info" || threadCombo == "info/theory") {
+  
+} else if (threadCombo == "sysArch/modSim" || threadCombo == "modSim/sysArch") {
+  
+} else if (threadCombo == "sysArch/devices" || threadCombo == "devices/sysArch") {
+  
+} else if (threadCombo == "sysArch/info" || threadCombo == "info/sysArch") {
+  
+} else if (threadCombo == "modSim/devices" || threadCombo == "devices/modSim") {
+  
+} else if (threadCombo == "modSim/info" || threadCombo == "info/modSim") {
+  
+} else if (threadCombo == "info/devices" || threadCombo == "devices/info") {
+  
+}
+
+
+var margin = {top: 20, right: 120, bottom: 20, left: 120},
+  width = 960 - margin.right - margin.left,
+  height = 500 - margin.top - margin.bottom;
+
+var i = 0,
+  duration = 750,
+  root;
+
+var tree = d3.layout.tree()
+  .size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+  .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("#tree")
+  .append("svg")
+  .attr("width", width + margin.right + margin.left)
+  .attr("height", height + margin.top + margin.bottom)
+  .call(d3.behavior.zoom().on("zoom", function() {
+    svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+  }))
+  .append("g");
+
+
+d3.json("/data", function(data){
+    console.log(data);
+     root = data[0];
+    root.x0 = width;
+     root.y0 = height/2;
+     update(root);
+ });
+  // d3.json("threads/info&ai.json", function(error, data) {
+  //   console.log(data[0]);
+  //   root = data[0];
+  //   root.x0 = width;
+  //   root.y0 = height/2;
+  //   update(root);
+  //});
+
+d3.select(self.frameElement).style("height", "500px");
+
+
+function update(source) {
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+    links = tree.links(nodes);
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = width - (d.depth * 100); });
+  // Update the nodes…
+  var node = svg.selectAll("g.node")
+    .data(nodes, function(d) { return d.id || (d.id = ++i); });
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("g")
+    .attr("class", "node")
+    .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
+    .on("click", click);
+  nodeEnter.append("circle")
+    .attr("r", function(d) {return d.radius;})
+    .style("stroke", function(d) {return d.outline;})
+    .style("fill", function(d) {return d.fill;});
+    // .attr("r", 1e-6)
+    // .style("fill", function(d) { return d._children ? "lightgrey" : "#fff"; });
+  nodeEnter.append("text")
+    .attr("x", function(d) { return d.children || d._children ? d.radius + 5 : -1*d.radius - 5; }) // make this by radius and by length of name
+    .attr("dy", ".35em")
+    .attr("text-anchor", function(d) { return d.children || d._children ? "start" : "end"; })
+    .text(function(d) { return d.name; })
+    .style("fill-opacity", 1e-6);
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+    .duration(duration)
+    .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+  nodeUpdate.select("circle")
+    .attr("r", function(d) {return d.radius;})
+    .style("stroke", function(d) {return d.outline;})
+    .style("fill", function(d) {// `TODO` can just do if (plan mode) -> replace d.taken with d.planned
+      if(!d.numChildrenNeeded) {
+        d.fill = "white"
+      }
+      else if(!d.taken) {
+        d.fill = "red"
+      }
+      if(d.children) {
+        num = 0;
+        for(var i = 0; i < d.children.length; i++) {
+          if(d.children[i].taken == 1) {
+            num++;
+          }
+        }
+        if(num >= d.numChildrenNeeded) {
+          d.fill = "white"
+        }
+        else {
+          d.fill = "red"
+          d.taken = 0 //TODO be real careful about taking courses you don't have the prereqs satisfied for
+        }
+      }
+      if(d.taken == 1) {
+        d.fill = "green"
+      }
+      var reg = /\d/g;
+      if(!reg.test(d.name)) {
+        if(d.fill == "white") {
+          d.fill = "green"
+          d.taken = 1
+        }
+      }
+      return d.fill;});
+    // .attr("r", 10)
+    // .style("fill", function(d) { return d._children ? "lightgrey" : "#fff"; });
+  nodeUpdate.select("text")
+    .style("fill-opacity", 1);
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+    .duration(duration)
+    .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
+    .remove();
+  nodeExit.select("circle")
+    .attr("r", 1e-6);
+    console.log(source)
+  nodeExit.select("text")
+    .style("fill-opacity", 1e-6);
+  // Update the links…
+  var link = svg.selectAll("path.link")
+    .data(links, function(d) { return d.target.id; });
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("path", "g")
+    .attr("class", "link")
+    .attr("d", function(d) {
+    var o = {x: source.x0, y: source.y0};
+    return diagonal({source: o, target: o});
+    });
+  // Transition links to their new position.
+  link.transition()
+    .duration(duration)
+    .attr("d", diagonal);
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+    .duration(duration)
+    .attr("d", function(d) {
+    var o = {x: source.x, y: source.y};
+    return diagonal({source: o, target: o});
+    })
+    .remove();
+  svg.selectAll(".link")
+    .style('stroke', function(d){
+      return d.target.fill;
+    })
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+  d.x0 = d.x;
+  d.y0 = d.y;
+  });
+}
+// Toggle children on click.
+// Take the user to course crituqe page
+ function click(d) {
+  //  d.taken = !d.taken
+  //  while(d) {
+  //    update(d)
+  //    d = d.parent
+  //  }
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update(d);
+ }
+</script>
     </body>
 </html>
